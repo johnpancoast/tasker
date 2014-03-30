@@ -5,11 +5,12 @@
         "php": ">=5.4.0",
         "symfony/config": "dev-master",
         "symfony/console": "dev-master",
-		"psr/log": "dev-master"
+        "symfony/yaml": "dev-master",
+        "psr/log": "dev-master"
     },
     "autoload": {
         "psr-4": {
-            "Shideon\\Tasker\\": "src/Shideon/Tasker"
+            "Shideon\\Tasker\\": "src/"
         }
-	}
+    }
 }
