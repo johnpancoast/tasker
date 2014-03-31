@@ -18,7 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Definition\Processor;
 
-use Shideon\Tasker\Configuration;
+use Shideon\Tasker;
 
 /**
  * Command to execute scheduled jobs once or continuously as a daemon.
@@ -72,27 +72,14 @@ class Command extends ConsoleCommand
             throw new \Exception('Must set --config.');
         }
 
-        if ($this->options['daemon']) {
-            $this->runDaemon();
-            exit;
-        }
-
-        $this->runOneTime();
-    }
-
-    private function runDaemon()
-    {
-        // handle daemon mode
-        // call runOneTime() every second.
-    }
-
-    private function runOneTime()
-    {
         $processor = new Processor();
         $configuration = new Configuration();
         $this->config = $processor->processConfiguration(
             $configuration,
             [Yaml::parse($this->options['config']]
         );
+
+        $tasker = new Tasker\Tasker;
+        $output->write($tasker->run($this->options['daemon']));
     }
 }
