@@ -76,10 +76,10 @@ class Command extends ConsoleCommand
         $configuration = new Configuration();
         $this->config = $processor->processConfiguration(
             $configuration,
-            [Yaml::parse($this->options['config']]
+            [Yaml::parse($this->options['config'])]
         );
 
-        $tasker = new Tasker\Tasker;
+        $tasker = new Tasker\Tasker($this->config['tasker']);
         $output->write($tasker->run($this->options['daemon']));
     }
 }
