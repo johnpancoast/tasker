@@ -33,13 +33,6 @@ class TaskerCommand extends ConsoleCommand
     private $options = [];
 
     /**
-     * @var array Processed configuration
-     *
-     * @access private
-     */
-    private $config = [];
-
-    /**
      * {@inheritDoc}
      */
     protected function configure()
