@@ -10,46 +10,135 @@
 namespace Shideon\Tasker;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use Shideon\Tasker;
+use Shideon\Tasker as TaskerBase;
+
+use Symfony\Component\Yaml\Yaml;
+use Symfony\Component\Config\Definition\Processor;
+
 
 /**
  * Main tasker functionality
  *
  * @author John Pancoast <shideon@gmail.com>
+ * @todo add monolog
  */
 class Tasker {
+    /**
+     * @var string The config file
+     *
+     * @qaccess private
+     */
+    private $configFile;
+
+    /**
+     * @var array A collection of {@link Task objects}
+     *
+     * @access private
+     */
     private $tasks = [];
 
-    public function __construct(array $tasks)
+    /**
+     * @var bool Has the class initialized
+     *
+     * @access private
+     */
+    private $isInit = false;
+
+    /**
+     * @var float The start microtime of a loop of work.
+     *
+     * @access private
+     */
+    private $startMicroTime;
+
+    /**
+     * @var string The root dir of the project
+     *
+     * @access private
+     * @static
+     */
+    private static $rootDir;
+
+    /**
+     * Constructor
+     *
+     * @access public
+     */
+    public function __construct($configFile)
     {
-        $this->tasks = $tasks;
+        $this->configFile = $configFile;
+        $this->rootDir = __DIR__.'/../';
     }
 
-    public function run($continuos = false)
+    /**
+     * Ininitizlie
+     *
+     * @access private
+     */
+    private function init()
+    {
+        if ($this->isInit) {
+            return;
+        }
+
+        $processor = new Processor();
+        $configuration = new Configuration();
+        $config = $processor->processConfiguration(
+            $configuration,
+            [Yaml::parse($this->configFile)]
+        );
+
+        foreach ($config['tasker'] as $task)
+        {
+            $taskObj = new TaskerBase\Task;
+            $taskObj->setName($task['name']);
+            $taskObj->setTime($task['time']);
+
+            if (isset($task['class'])) {
+                $taskObj->setClass($task['class']);
+            }
+
+            if (isset($task['command'])) {
+                $taskObj->setCommand($task['command']);
+                $taskObj->setArgument($task['command_args']);
+            }
+
+            $this->tasks[$task['name']] = $taskObj;
+        }
+    }
+
+    /**
+     * Run main tasker functionality
+     *
+     * @access public
+     * @param bool $continuous Do we run scheduled jobs regularly?
+     * @todo I'm wondering if the continuous functionality should be moved out of here. Not sure yet.
+     */
+    public function run($continuous = false)
     {
         while (true) {
-            $startMicro = microtime(true);
+            $this->startMicroTime = microtime(true);
 
-            foreach ($this->tasks as $task)
-            {
-                $taskObj = new Tasker\Task;
-                $taskObj->setName($task['name']);
-                $taskObj->setTime($task['time']);
+            $this->init();
 
-                if (isset($task['class'])) {
-                    $taskObj->setClass($task['class']);
+            foreach ($this->tasks as $task) {
+                if ($task->doRun()) {
+                    // run the job in the background.
+                    // need to allow asynchronous calls for this code
+                    // to be of any use.
+                    $cmd = "nohup php ".self::$rootDir."console.php shideon:tasker:run_task --config='".$this->configFile."' --task_name='".$task->getName()."' > /dev/null";
+                    $output = shell_exec($cmd);
+
+                    // TODO check output for errors, log.
+
                 }
-
-                if (isset($task['command'])) {
-                    $taskObj->setCommand($task['command']);
-                    $taskObj->setArgument($task['command_args']);
-                }
-
-                $taskObj->run();
             }
 
             if ($continuous) {
-                usleep(min(0, (float)1000000 - (microtime(true) - $startMicro)));
+                while (microtime(true) - $this->startMicroTime < 1) {
+                    usleep(1000);
+                }
+
                 continue;
             }
 

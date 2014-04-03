@@ -77,6 +77,7 @@ class Task {
      * Run task from class
      *
      * @access private
+     * @return 
      */
     private function runClass()
     {
@@ -85,6 +86,8 @@ class Task {
         if (!($obj instanceof TaskInterface)) {
             throw new \Exception('Task must implement Shideon\Tasker\TaskInterface');
         } 
+
+        $obj->run();
     }
 
     /**
@@ -97,8 +100,10 @@ class Task {
     {
         $this->validate();
 
-        // check time string, return bool
+        // TODO check time string, return bool
 
+        // fake success for now
+        return true;
     }
 
     /**
@@ -123,10 +128,6 @@ class Task {
 
         if ($this->class && $this->command) {
             throw new TaskValidationException('Cannot set class and command since we won\'t know which to run');
-        }
-
-        if ($this->command && empty($this->commandArgs)) {
-            throw new TaskValidationException('Must set command args');
         }
     }
 

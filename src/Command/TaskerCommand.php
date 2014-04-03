@@ -7,7 +7,7 @@
  * @license MIT
  */
 
-namespace Shideon\Tasker;
+namespace Shideon\Tasker\Command;
 
 use Symfony\Component\Console\Command\Command as ConsoleCommand;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,17 +15,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Symfony\Component\Yaml\Yaml;
-use Symfony\Component\Config\Definition\Processor;
-
 use Shideon\Tasker;
 
 /**
  * Command to execute scheduled jobs once or continuously as a daemon.
  *
  * @author John Pancoast <shideon@gmail.com>
+ * @todo add monolog
  */
-class Command extends ConsoleCommand
+class TaskerCommand extends ConsoleCommand
 {
     /**
      * @var array Passed args and options
@@ -41,6 +39,9 @@ class Command extends ConsoleCommand
      */
     private $config = [];
 
+    /**
+     * {@inheritDoc}
+     */
     protected function configure()
     {
         $this
@@ -52,15 +53,12 @@ class Command extends ConsoleCommand
                InputOption::VALUE_REQUIRED,
                 'Config file.'
             )
-            ->addOption(
-                'daemon',
-                'd',
-               InputOption::VALUE_OPTIONAL,
-                'Run continuously as a daemon.'
-            )
         ;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $this->options = [
@@ -72,14 +70,10 @@ class Command extends ConsoleCommand
             throw new \Exception('Must set --config.');
         }
 
-        $processor = new Processor();
-        $configuration = new Configuration();
-        $this->config = $processor->processConfiguration(
-            $configuration,
-            [Yaml::parse($this->options['config'])]
-        );
+        // absolute or relative path can be passed.
+        $file = (substr($this->options['config'], 0, 1) == '/') ? $this->options['config'] : getcwd().$this->options['config'];
 
-        $tasker = new Tasker\Tasker($this->config['tasker']);
-        $output->write($tasker->run($this->options['daemon']));
+        $tasker = new Tasker\Tasker($file);
+        $output->write($tasker->run());
     }
 }

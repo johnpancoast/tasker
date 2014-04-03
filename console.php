@@ -2,10 +2,10 @@
 
 require 'vendor/autoload.php';
 
-use Shideon\Tasker as Tasker;
+use Shideon\Tasker\Command as Command;
 use Symfony\Component\Console\Application;
 
 $application = new Application();
-$application->add(new Tasker\Command\TaskerCommand);
-$application->add(new Tasker\Command\RunTaskCommand);
+$application->add(new Command\TaskerCommand);
+$application->add(new Command\RunTaskCommand);
 $application->run();
