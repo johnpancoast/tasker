@@ -56,7 +56,6 @@ class TaskerCommand extends ConsoleCommand
     {
         $this->options = [
             'config' => $input->getOption('config'),
-            'daemon' => $input->getOption('daemon')
         ];
 
         if (!$this->options['config']) {
