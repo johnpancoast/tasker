@@ -88,8 +88,7 @@ class RunTaskCommand extends ConsoleCommand
                 'task_command_arguments' => $input->getOption('task_command_arguments'),
             ];
 
-            $task = new Tasker\Task($this->options['task_name']);
-            $task
+            Tasker\Task::factory($this->options['task_name'])
                 ->setClass($this->options['task_class'])
                 ->setCommand($this->options['task_command'])
                 ->setCommandArgs((array)json_decode($this->options['task_command_arguments'], true))

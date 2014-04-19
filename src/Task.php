@@ -68,6 +68,20 @@ class Task {
     }
 
     /**
+     * Simple static factory for convenience
+     *
+     * @access public
+     * @static
+     * @param string $name The name of this task.
+     * @param string $cronString The cron time string.
+     * @return self
+     */
+    public static function factory($name, $cronString = '')
+    {
+        return new self($name, $cronString);
+    }
+
+    /**
      * Run task
      *
      * @access public
@@ -94,7 +108,7 @@ class Task {
         if (!class_exists($this->class)) {
             throw new \Exception('Task class '.$this->class.' does not exist.');
         }
-        
+
         $obj = new $this->class;
 
         if (!($obj instanceof TaskInterface)) {
