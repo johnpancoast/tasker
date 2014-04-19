@@ -20,6 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  *
  * @author John Pancoast <shideon@gmail.com>
  * @todo add monolog
+ * @todo ditch this class if turns out it's not necessary.
  */
 class Command extends ConsoleCommand
 {

@@ -123,7 +123,8 @@ class Tasker {
                     // to be of any use.
                     // TODO add ability to log program output to file
                     // although I'm not sure if monolog would be enough there.
-                    $cmd = "nohup php ".$this->rootDir."console.php shideon:tasker:run_task --config='".$this->configFile."' --task_name='".$task->getName()."' > /dev/null 2> /dev/null &";
+                    $cmd = "nohup php ".$this->rootDir."console.php shideon:tasker:run_task --config='".$this->configFile."' --task_name='".$task->getName()."' > /dev/null &";
+
                     shell_exec($cmd);
                 }
             }
