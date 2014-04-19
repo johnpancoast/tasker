@@ -105,6 +105,8 @@ class Tasker {
 
             $this->tasks[$task['name']] = $taskObj;
         }
+
+        $this->isInit = true;
     }
 
     /**
