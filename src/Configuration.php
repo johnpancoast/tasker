@@ -28,11 +28,14 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('shideon_tasker');
+        $rootNode = $treeBuilder->root('shideon');
 
         $rootNode
             ->children()
-                ->append($this->appendTasks())
+            ->arrayNode('tasker')
+                ->children()
+                    ->append($this->appendTasks())
+                ->end()
             ->end();
 
         return $treeBuilder;

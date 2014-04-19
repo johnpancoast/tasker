@@ -82,13 +82,13 @@ class Tasker {
         }
 
         $processor = new Processor();
-        $configuration = new Configuration();
+        $configuration = new Configuration(); // Shideon\Tasker\Configuration
         $config = $processor->processConfiguration(
             $configuration,
             [Yaml::parse($this->configFile)]
         );
 
-        foreach ($config['tasks'] as $task)
+        foreach ($config['tasker']['tasks'] as $task)
         {
             $taskObj = new TaskerBase\Task($task['name'], $task['time']);
 
