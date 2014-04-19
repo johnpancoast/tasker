@@ -114,8 +114,8 @@ abstract class AbstractCommand extends ConsoleCommand
      */
     protected function getConfigOptions()
     {
-        // ATM, all that's expected is the below but the code assuming
-        // future will expect more.
+        // ATM, all that's expected is the below but the code is
+        // assuming that the future will expect more at this layer.
         $options = [];
 
         if ($this->isLogFileRequired()) {
