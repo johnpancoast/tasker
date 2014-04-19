@@ -28,7 +28,7 @@ class Configuration implements ConfigurationInterface
     public function getConfigTreeBuilder()
     {
         $treeBuilder = new TreeBuilder();
-        $rootNode = $treeBuilder->root('shideon');
+        $rootNode = $treeBuilder->root('shideon_tasker');
 
         $rootNode
             ->children()
@@ -41,7 +41,7 @@ class Configuration implements ConfigurationInterface
     public function appendTasks()
     {
         $treeBuilder = new TreeBuilder();
-        $node = $treeBuilder->root('tasker');
+        $node = $treeBuilder->root('tasks');
 
         $node
             ->isRequired()
