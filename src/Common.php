@@ -46,11 +46,11 @@ class Common
     }
 
     /**
-     * Get an absolute path of a config file
+     * Get an absolute path of a file/path
      *
      * @access public
      * @static
-     * @param string $file A config file path
+     * @param string $file A file path
      */
     public static function getAbsolutePath($path)
     {
