@@ -9,7 +9,6 @@
 
 namespace Shideon\Tasker\Command;
 
-use Symfony\Component\Console\Command\Command as ConsoleCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,22 +22,11 @@ use Shideon\Tasker;
  * @author John Pancoast <shideon@gmail.com>
  * @todo add monolog
  */
-class RunTaskCommand extends ConsoleCommand
+class RunTaskCommand extends Tasker\Command
 {
     /**
-     * @var array Passed args and options
-     *
-     * @access private
+     * {@inheritDoc}
      */
-    private $options = [];
-
-    /**
-     * @var array Processed configuration
-     *
-     * @access private
-     */
-    private $config = [];
-
     protected function configure()
     {
         $this
@@ -77,6 +65,9 @@ class RunTaskCommand extends ConsoleCommand
         ;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {

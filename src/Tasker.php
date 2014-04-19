@@ -15,7 +15,6 @@ use Shideon\Tasker as TaskerBase;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Definition\Processor;
 
-
 /**
  * Main tasker functionality
  *
