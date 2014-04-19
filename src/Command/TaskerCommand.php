@@ -63,7 +63,7 @@ class TaskerCommand extends ConsoleCommand
         }
 
         // absolute or relative path can be passed.
-        $file = (substr($this->options['config'], 0, 1) == '/') ? $this->options['config'] : getcwd().$this->options['config'];
+        $file = (substr($this->options['config'], 0, 1) == '/') ? $this->options['config'] : getcwd().'/'.$this->options['config'];
 
         $tasker = new Tasker\Tasker($file);
         $output->write($tasker->run());
