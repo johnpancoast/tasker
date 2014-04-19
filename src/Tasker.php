@@ -71,7 +71,7 @@ class Tasker {
     }
 
     /**
-     * Ininitizlie
+     * Initialize
      *
      * @access private
      */
@@ -122,13 +122,13 @@ class Tasker {
             $this->init();
 
             foreach ($this->tasks as $task) {
-                if ($task->doRun()) {
+                if ($task->isDue()) {
                     // run the job in the background.
                     // need to allow asynchronous calls for this code
                     // to be of any use.
                     // TODO add ability to log program output to file
                     // although I'm not sure if monolog would be enough there.
-                    $cmd = "nohup php ".self::$rootDir."console.php shideon:tasker:run_task --config='".$this->configFile."' --task_name='".$task->getName()."' > /dev/null 2>/dev/null &";
+                    $cmd = "nohup php ".$this->rootDir."console.php shideon:tasker:run_task --config='".$this->configFile."' --task_name='".$task->getName()."' > /dev/null 2>/dev/null &";
                     shell_exec($cmd);
                 }
             }

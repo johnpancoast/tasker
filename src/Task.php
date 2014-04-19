@@ -110,7 +110,7 @@ class Task {
      * @access public
      * @return bool
      */
-    public function doRun()
+    public function isDue()
     {
         $this->validate();
 
