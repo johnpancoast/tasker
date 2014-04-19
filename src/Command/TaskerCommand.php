@@ -9,12 +9,15 @@
 
 namespace Shideon\Tasker\Command;
 
+use Shideon\Tasker;
+use Shideon\Tasker\Exception\RequiredCommandOptionException;
+
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Shideon\Tasker;
+use Monolog\Logger;
 
 /**
  * Command to execute scheduled jobs once or continuously as a daemon.
@@ -53,7 +56,7 @@ class TaskerCommand extends Tasker\AbstractCommand
     protected function getConfigOptions()
     {
         return array_merge(
-            parent::getConfigOptions(true),
+            parent::getConfigOptions(),
             [
                 [
                     'config',
@@ -82,9 +85,11 @@ class TaskerCommand extends Tasker\AbstractCommand
         try {
             $this->init($input, $output, ['config']);
 
-            $config = Tasker\Common::getConfigArray($this->options['config']);
-
             $logger = $this->buildLogger();
+
+            $logger->log(Logger::DEBUG, 'Beginning tasker command.');
+
+            $config = Tasker\Common::getConfigArray($this->options['config']);
 
             foreach ($config['tasker']['tasks'] as $task)
             {
@@ -102,10 +107,23 @@ class TaskerCommand extends Tasker\AbstractCommand
                 $tasks[] = $taskObj;
             }
 
+            $logger->log(Logger::DEBUG, 'Calling on Shideon\Tasker\Tasker');
+
             $tasker = new Tasker\Tasker($tasks, $logger);
+
+            if ($this->isLogFileRequired()) {
+                $tasker->setLogFile($this->options['log_file']);
+                $tasker->setLogLevel($this->options['log_level']);
+            }
+
             $output->write($tasker->run());
+        } catch (RequiredCommandOptionException $e) {
+            // we cannot log these exceptions since we've
+            // failed at option validation and we need options
+            // for a logger to be created.
+            throw $e;
         } catch (\Exception $e) {
-            $logger->log(Logger::CRITICAL, 'Exception encountered in '.get_class($this), $e);
+            $logger->log(Logger::CRITICAL, 'Encountered exception in '.get_class($this), [$e, 'trace' => $e->getTraceAsString()]);
 
             throw $e;
         }

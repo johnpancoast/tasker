@@ -85,11 +85,12 @@ class Task {
      * @static
      * @param string $name The name of this task.
      * @param string $cronString The cron time string.
+     * @param Logger $logger A monolog logger
      * @return self
      */
-    public static function factory($name, $cronString = '')
+    public static function factory($name, $cronString = '', Logger $logger)
     {
-        return new self($name, $cronString);
+        return new self($name, $cronString, $logger);
     }
 
     /**

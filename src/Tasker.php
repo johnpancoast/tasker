@@ -11,6 +11,7 @@ namespace Shideon\Tasker;
 
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Definition\Processor;
+use Symfony\Component\Process\Process;
 
 use Monolog\Logger;
 
@@ -35,6 +36,30 @@ class Tasker
      * @access protected
      */
     protected $logger;
+
+    /**
+     * @var string $logFile The file we're logging to
+     *
+     * This is used for the subsequent call to run the task.
+     * Note that this is only relevant when the monolog logger
+     * is set internally in the lib. If the dev has extended
+     * then this functionality may not be relevant (code smell maybe but not really).
+     *
+     * @access protected
+     */
+    protected $logFile;
+
+    /**
+     * @var string $logLevel Set log level
+     *
+     * This is used for the subsequent call to run the task.
+     * Note that this is only relevant when the monolog logger
+     * is set internally in the lib. If the dev has extended
+     * then this functionality may not be relevant (code smell maybe but not really).
+     *
+     * @access protected
+     */
+    protected $logLevel;
 
     /**
      * @var float The start microtime of a loop of work.
@@ -84,11 +109,22 @@ class Tasker
                 // to be of any use.
                 // TODO add ability to log program output to file
                 // although I'm not sure if monolog would be enough there.
-                $cmd = "nohup php ".$this->rootDir."console.php shideon:tasker:run_task ".Common::buildTaskCommandArgs($task)." > /dev/null &";
+                $cmd = "php ".$this->rootDir."console.php shideon:tasker:run_task ".Common::buildTaskCommandArgs($task);
 
-                $this->logger->log(Logger::INFO, "Running task '".$task->getName()."': $cmd");
+                if ($this->logFile) {
+                    $cmd .= " --log_file='".$this->logFile."'";
+                }
 
-                shell_exec($cmd);
+                if ($this->logLevel) {
+                    $cmd .= " --log_level='".$this->logLevel."'";
+                }
+
+                $this->logger->log(Logger::INFO, "Running task '".$task->getName()."' in background: $cmd");
+
+                // note that we use shell_exec instead of symfony's
+                // Process because it's causing issues with
+                // sub process having open file hdnle.
+                shell_exec("nohup $cmd > /dev/null &");
             } else {
                 $this->logger->log(Logger::DEBUG, "Task '".$task->getName()."' due to run: NO");
             }
@@ -123,5 +159,37 @@ class Tasker
     public function setLogger(Logger $logger)
     {
         $this->logger = $logger;
+    }
+
+    /**
+     * Set file we're logging to
+     *
+     * This is used for the subsequent call to run the task.
+     * Note that this is only relevant when the monolog logger
+     * is set internally in the lib. If the dev has extended
+     * then this functionality may not be relevant (code smell maybe but not really).
+     *
+     * @access public
+     * @param string $logFile Set log file.
+     */
+    public function setLogFile($logFile)
+    {
+        $this->logFile = $logFile;
+    }
+
+    /**
+     * Set log level
+     *
+     * This is used for the subsequent call to run the task.
+     * Note that this is only relevant when the monolog logger
+     * is set internally in the lib. If the dev has extended
+     * then this functionality may not be relevant (code smell maybe but not really).
+     *
+     * @access public
+     * @param string $logFile Set log file.
+     */
+    public function setLogLevel($logLevel)
+    {
+        $this->logLevel = $logLevel;
     }
 }
