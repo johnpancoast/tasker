@@ -74,10 +74,6 @@ class Task {
      */
     public function run()
     {
-        if (!$this->doRun()) {
-            return;
-        }
-
         $this->validate();
 
         if ($this->class) {

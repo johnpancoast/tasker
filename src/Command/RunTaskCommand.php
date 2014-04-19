@@ -61,12 +61,40 @@ class RunTaskCommand extends ConsoleCommand
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->options = [
-            'config' => $input->getOption('config'),
-            'task_name' => $input->getOption('task_name')
-        ];
+        try {
+            $this->options = [
+                'config' => $input->getOption('config'),
+                'task_name' => $input->getOption('task_name')
+            ];
 
-        // just debug it for now.
-        file_put_contents(__DIR__.'/../../pancoast/log', print_r($this->options, true));
+            // get the config array that we were passed.
+            $config = Tasker\Tasker::getConfigArray($this->options['config']);
+
+            // get the task we're running
+            $taskObj = null;
+            foreach ($config['tasker']['task'] as $task) {
+                if ($task['name'] == $this->options['task_name']) {
+                    $taskObj = new Tasker\Task($task['name'], $task['time']);
+
+                    if (isset($task['class'])) {
+                        $taskObj->setClass($task['class']);
+                    }
+
+                    if (isset($task['command'])) {
+                        $taskObj->setCommand($task['command']);
+                        $taskObj->setArgument($task['command_args']);
+                    }
+                }
+            }
+
+            if (!$taskObj) {
+                throw new \Exception('Task not found.');
+            }
+
+            $taskObj->run();
+
+        } catch (\Exception $e) {
+            // log here
+        }
     }
 }

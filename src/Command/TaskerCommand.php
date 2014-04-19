@@ -9,7 +9,6 @@
 
 namespace Shideon\Tasker\Command;
 
-use Symfony\Component\Console\Command\Command as ConsoleCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -21,17 +20,9 @@ use Shideon\Tasker;
  * Command to execute scheduled jobs once or continuously as a daemon.
  *
  * @author John Pancoast <shideon@gmail.com>
- * @todo add monolog
  */
-class TaskerCommand extends ConsoleCommand
+class TaskerCommand extends Tasker\Command
 {
-    /**
-     * @var array Passed args and options
-     *
-     * @access private
-     */
-    private $options = [];
-
     /**
      * {@inheritDoc}
      */
@@ -62,10 +53,7 @@ class TaskerCommand extends ConsoleCommand
             throw new \Exception('Must set --config.');
         }
 
-        // absolute or relative path can be passed.
-        $file = (substr($this->options['config'], 0, 1) == '/') ? $this->options['config'] : getcwd().'/'.$this->options['config'];
-
-        $tasker = new Tasker\Tasker($file);
+        $tasker = new Tasker\Tasker($this->options['config']);
         $output->write($tasker->run());
     }
 }

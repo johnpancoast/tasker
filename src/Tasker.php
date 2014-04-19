@@ -66,7 +66,7 @@ class Tasker {
      */
     public function __construct($configFile)
     {
-        $this->configFile = $configFile;
+        $this->configFile = self::getAbsolutePath($configFile);
         $this->rootDir = __DIR__.'/../';
     }
 
@@ -81,12 +81,7 @@ class Tasker {
             return;
         }
 
-        $processor = new Processor();
-        $configuration = new Configuration(); // Shideon\Tasker\Configuration
-        $config = $processor->processConfiguration(
-            $configuration,
-            [Yaml::parse($this->configFile)]
-        );
+        $config = self::getConfigArray($this->configFile);
 
         foreach ($config['tasker']['tasks'] as $task)
         {
@@ -128,7 +123,7 @@ class Tasker {
                     // to be of any use.
                     // TODO add ability to log program output to file
                     // although I'm not sure if monolog would be enough there.
-                    $cmd = "nohup php ".$this->rootDir."console.php shideon:tasker:run_task --config='".$this->configFile."' --task_name='".$task->getName()."' > /dev/null 2>/dev/null &";
+                    $cmd = "nohup php ".$this->rootDir."console.php shideon:tasker:run_task --config='".$this->configFile."' --task_name='".$task->getName()."' > /dev/null 2> /dev/null &";
                     shell_exec($cmd);
                 }
             }
@@ -143,5 +138,39 @@ class Tasker {
 
             return;
         }
+    }
+
+    /**
+     * Get a config array given a file.
+     *
+     * This also doubles as config validation.
+     *
+     * @access public
+     * @static
+     * @param string $configFile The config file.
+     * @return array
+     */
+    public static function getConfigArray($configFile)
+    {
+        $configFile = self::getAbsolutePath($configFile);
+
+        $processor = new Processor();
+        $configuration = new Configuration(); // Shideon\Tasker\Configuration
+        return $processor->processConfiguration(
+            $configuration,
+            [Yaml::parse($configFile)]
+        );
+    }
+
+    /**
+     * Get an absolute path of a config file
+     *
+     * @access public
+     * @static
+     * @param string $file A config file path
+     */
+    public static function getAbsolutePath($path)
+    {
+       return (substr($path, 0, 1) == '/') ? $path : getcwd().'/'.$path;
     }
 }
