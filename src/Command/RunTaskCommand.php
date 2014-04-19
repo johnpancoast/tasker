@@ -84,6 +84,8 @@ class RunTaskCommand extends ConsoleCommand
                         $taskObj->setCommand($task['command']);
                         $taskObj->setArgument($task['command_args']);
                     }
+
+                    break;
                 }
             }
 
