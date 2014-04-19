@@ -22,7 +22,8 @@ use Symfony\Component\Config\Definition\Processor;
  * @author John Pancoast <shideon@gmail.com>
  * @todo add monolog
  */
-class Tasker {
+class Tasker
+{
     /**
      * @var string The config file
      *
@@ -66,7 +67,7 @@ class Tasker {
      */
     public function __construct($configFile)
     {
-        $this->configFile = self::getAbsolutePath($configFile);
+        $this->configFile = TaskerBase\Common::getAbsolutePath($configFile);
         $this->rootDir = __DIR__.'/../';
     }
 
@@ -81,7 +82,7 @@ class Tasker {
             return;
         }
 
-        $config = self::getConfigArray($this->configFile);
+        $config = TaskerBase\Common::getConfigArray($this->configFile);
 
         foreach ($config['tasker']['tasks'] as $task)
         {
@@ -139,39 +140,5 @@ class Tasker {
 
             return;
         }
-    }
-
-    /**
-     * Get a config array given a file.
-     *
-     * This also doubles as config validation.
-     *
-     * @access public
-     * @static
-     * @param string $configFile The config file.
-     * @return array
-     */
-    public static function getConfigArray($configFile)
-    {
-        $configFile = self::getAbsolutePath($configFile);
-
-        $processor = new Processor();
-        $configuration = new Configuration(); // Shideon\Tasker\Configuration
-        return $processor->processConfiguration(
-            $configuration,
-            [Yaml::parse($configFile)]
-        );
-    }
-
-    /**
-     * Get an absolute path of a config file
-     *
-     * @access public
-     * @static
-     * @param string $file A config file path
-     */
-    public static function getAbsolutePath($path)
-    {
-       return (substr($path, 0, 1) == '/') ? $path : getcwd().'/'.$path;
     }
 }
