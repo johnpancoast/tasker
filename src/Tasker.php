@@ -73,11 +73,9 @@ class Tasker
     public function run()
     {
         $this->startMicroTime = microtime(true);
-        $this->logger->log(Logger::DEBUG, 'Checking tasks that are due to run.');
+        $this->logger->log(Logger::INFO, 'Checking tasks that are due to run.');
 
         foreach ($this->tasks as $task) {
-            $this->logger->log(Logger::DEBUG, "Checking task '".$task->getName()."'");
-
             if ($task->isDue()) {
                 $this->logger->log(Logger::DEBUG, "Task '".$task->getName()."' due to run: YES");
 

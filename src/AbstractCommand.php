@@ -119,13 +119,25 @@ abstract class AbstractCommand extends ConsoleCommand
         $options = [];
 
         if ($this->isLogFileRequired()) {
-            $options[] = [
-                'log_file',
-                'f',
-               InputOption::VALUE_REQUIRED,
-               'Log file',
-                null
-            ];
+            $options = array_merge(
+                $options,
+                [
+                    [
+                        'log_file',
+                        'f',
+                       InputOption::VALUE_REQUIRED,
+                       'Log file',
+                        null
+                    ],
+                    [
+                        'log_level',
+                        'e',
+                       InputOption::VALUE_REQUIRED,
+                       'Log level',
+                        null
+                    ]
+                ]
+            );
         }
 
         return $options;
@@ -144,7 +156,7 @@ abstract class AbstractCommand extends ConsoleCommand
         }
 
         $logger = new Logger('shideon_tasker_main');
-        $logger->pushHandler(new StreamHandler($this->options['log_file'], Logger::INFO));;
+        $logger->pushHandler(new StreamHandler($this->options['log_file'], $this->options['log_level'] ?: Logger::INFO));;
 
         return $logger;
     }
