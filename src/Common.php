@@ -10,10 +10,10 @@
 namespace Shideon\Tasker;
 
 use Symfony\Component\Console\Output\OutputInterface;
-use Shideon\Tasker as TaskerBase;
-
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Definition\Processor;
+
+use Shideon\Tasker as TaskerBase;
 
 
 /**
