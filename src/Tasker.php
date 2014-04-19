@@ -88,11 +88,9 @@ class Tasker {
             [Yaml::parse($this->configFile)]
         );
 
-        foreach ($config['tasker'] as $task)
+        foreach ($config['tasks'] as $task)
         {
-            $taskObj = new TaskerBase\Task;
-            $taskObj->setName($task['name']);
-            $taskObj->setTime($task['time']);
+            $taskObj = new TaskerBase\Task($task['name'], $task['time']);
 
             if (isset($task['class'])) {
                 $taskObj->setClass($task['class']);
@@ -130,11 +128,8 @@ class Tasker {
                     // to be of any use.
                     // TODO add ability to log program output to file
                     // although I'm not sure if monolog would be enough there.
-                    $cmd = "nohup php ".self::$rootDir."console.php shideon:tasker:run_task --config='".$this->configFile."' --task_name='".$task->getName()."' > /dev/null";
-                    $output = shell_exec($cmd);
-
-                    // TODO check output for errors, log.
-
+                    $cmd = "nohup php ".self::$rootDir."console.php shideon:tasker:run_task --config='".$this->configFile."' --task_name='".$task->getName()."' > /dev/null 2>/dev/null &";
+                    shell_exec($cmd);
                 }
             }
 

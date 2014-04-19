@@ -11,6 +11,7 @@ namespace Shideon\Tasker;
 
 use Shideon\Tasker\TaskInterface;
 use Shideon\Tasker\Exception\TaskValidationException;
+use Cron\CronExpression;
 
 /**
  * A single task
@@ -52,6 +53,19 @@ class Task {
      * @access private
      */
     private $commandArgs = [];
+
+    /**
+     * Constructor
+     *
+     * @access public
+     * @param string $name The name of this task.
+     * @param string $cronString The cron time string.
+     */
+    public function __construct($name, $cronString)
+    {
+        $this->setName($name);
+        $this->setCronString($cronString);
+    }
 
     /**
      * Run task
@@ -100,10 +114,7 @@ class Task {
     {
         $this->validate();
 
-        // TODO check time string, return bool
-
-        // fake success for now
-        return true;
+        return CronExpression::factory($this->getCronString())->isDue();
     }
 
     /**
@@ -114,14 +125,6 @@ class Task {
      */
     public function validate()
     {
-        if (!$this->name) {
-            throw new TaskValidationException('Must set name before running');
-        }
-
-        if (!$this->time) {
-            throw new TaskValidationException('Must set time before running');
-        }
-
         if (!$this->class && !$this->command) {
             throw new TaskValidationException('Must set class or command');
         }
@@ -156,25 +159,25 @@ class Task {
     }
 
     /**
-     * Gets the value of time.
+     * Gets the value of cron time string.
      *
-     * @return string Task name
+     * @return Cron time string.
      */
-    public function getTime()
+    public function getCronString()
     {
-        return $this->time;
+        return $this->cronString;
     }
     
     /**
-     * Sets the value of time.
+     * Sets the value of cron time string
      *
-     * @param string Task name $time the time
+     * @param string $cronString The cron time string.
      *
      * @return self
      */
-    public function setTime($time)
+    public function setCronString($cronString)
     {
-        $this->time = $time;
+        $this->cronString = $cronString;
 
         return $this;
     }
