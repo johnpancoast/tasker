@@ -56,4 +56,23 @@ class Common
     {
        return (substr($path, 0, 1) == '/') ? $path : getcwd().'/'.$path;
     }
+
+    /**
+     * Given a {@link Task} object, make command arguments for the run task command.
+     *
+     * @access public
+     * @static
+     * @param Task
+     * @return string
+     */
+    public static function buildTaskCommandArgs(Task $task)
+    {
+        $cmd = "--task_name='".$task->getName()."' --task_class='".$task->getClass()."' ";
+
+        if (strlen($task->getCommand()) > 0) {
+            $cmd .= "--task_command='".$task->getCommand()." --task_command_arguments='".json_encode($task->getCommandArgs())."'";
+        }
+
+        return $cmd;
+    }
 }

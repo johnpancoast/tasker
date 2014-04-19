@@ -61,7 +61,7 @@ class Task {
      * @param string $name The name of this task.
      * @param string $cronString The cron time string.
      */
-    public function __construct($name, $cronString)
+    public function __construct($name, $cronString = '')
     {
         $this->setName($name);
         $this->setCronString($cronString);
@@ -91,6 +91,10 @@ class Task {
      */
     private function runClass()
     {
+        if (!class_exists($this->class)) {
+            throw new \Exception('Task class '.$this->class.' does not exist.');
+        }
+        
         $obj = new $this->class;
 
         if (!($obj instanceof TaskInterface)) {

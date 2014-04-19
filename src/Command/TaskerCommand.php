@@ -53,7 +53,25 @@ class TaskerCommand extends Tasker\Command
             throw new \Exception('Must set --config.');
         }
 
-        $tasker = new Tasker\Tasker($this->options['config']);
+        $config = Tasker\Common::getConfigArray($this->options['config']);
+
+        foreach ($config['tasker']['tasks'] as $task)
+        {
+            $taskObj = new Tasker\Task($task['name'], $task['time']);
+
+            if (isset($task['class'])) {
+                $taskObj->setClass($task['class']);
+            }
+
+            if (isset($task['command'])) {
+                $taskObj->setCommand($task['command']);
+                $taskObj->setArgument($task['command_args']);
+            }
+
+            $tasks[] = $taskObj;
+        }
+
+        $tasker = new Tasker\Tasker($tasks);
         $output->write($tasker->run());
     }
 }

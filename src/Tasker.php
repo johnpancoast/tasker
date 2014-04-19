@@ -25,25 +25,11 @@ use Symfony\Component\Config\Definition\Processor;
 class Tasker
 {
     /**
-     * @var string The config file
-     *
-     * @qaccess private
-     */
-    private $configFile;
-
-    /**
      * @var array A collection of {@link Task objects}
      *
      * @access private
      */
     private $tasks = [];
-
-    /**
-     * @var bool Has the class initialized
-     *
-     * @access private
-     */
-    private $isInit = false;
 
     /**
      * @var float The start microtime of a loop of work.
@@ -64,43 +50,12 @@ class Tasker
      * Constructor
      *
      * @access public
+     * @param array $tasks A collection of {@link Task objects}
      */
-    public function __construct($configFile)
+    public function __construct(array $tasks)
     {
-        $this->configFile = TaskerBase\Common::getAbsolutePath($configFile);
         $this->rootDir = __DIR__.'/../';
-    }
-
-    /**
-     * Initialize
-     *
-     * @access private
-     */
-    private function init()
-    {
-        if ($this->isInit) {
-            return;
-        }
-
-        $config = TaskerBase\Common::getConfigArray($this->configFile);
-
-        foreach ($config['tasker']['tasks'] as $task)
-        {
-            $taskObj = new TaskerBase\Task($task['name'], $task['time']);
-
-            if (isset($task['class'])) {
-                $taskObj->setClass($task['class']);
-            }
-
-            if (isset($task['command'])) {
-                $taskObj->setCommand($task['command']);
-                $taskObj->setArgument($task['command_args']);
-            }
-
-            $this->tasks[$task['name']] = $taskObj;
-        }
-
-        $this->isInit = true;
+        $this->setTasks($tasks);
     }
 
     /**
@@ -115,8 +70,6 @@ class Tasker
         while (true) {
             $this->startMicroTime = microtime(true);
 
-            $this->init();
-
             foreach ($this->tasks as $task) {
                 if ($task->isDue()) {
                     // run the job in the background.
@@ -124,7 +77,7 @@ class Tasker
                     // to be of any use.
                     // TODO add ability to log program output to file
                     // although I'm not sure if monolog would be enough there.
-                    $cmd = "nohup php ".$this->rootDir."console.php shideon:tasker:run_task --config='".$this->configFile."' --task_name='".$task->getName()."' > /dev/null &";
+                    $cmd = "nohup php ".$this->rootDir."console.php shideon:tasker:run_task ".Common::buildTaskCommandArgs($task)." > /dev/null &";
 
                     shell_exec($cmd);
                 }
@@ -140,5 +93,22 @@ class Tasker
 
             return;
         }
+    }
+
+    /**
+     * Set tasks
+     *
+     * @access public
+     * @param array $tasks A collection of {@link Task objects}
+     */
+    public function setTasks(array $tasks)
+    {
+        foreach ($tasks as $task) {
+            if (!($task instanceof TaskerBase\Task)) {
+                throw new \Exception('$tasks must be an array of Shideon\Tasker\Task objects.');
+            }
+        }
+
+        $this->tasks = $tasks;
     }
 }
