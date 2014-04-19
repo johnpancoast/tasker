@@ -22,7 +22,7 @@ use Shideon\Tasker;
  * @author John Pancoast <shideon@gmail.com>
  * @todo add monolog
  */
-class RunTaskCommand extends Tasker\Command
+class RunTaskCommand extends Tasker\AbstractCommand
 {
     /**
      * {@inheritDoc}
@@ -53,36 +53,47 @@ class RunTaskCommand extends Tasker\Command
      */
     protected function getConfigOptions()
     {
-        return [
+        return array_merge(
+            parent::getConfigOptions(true),
             [
-                'task_name',
-                't',
-               InputOption::VALUE_REQUIRED,
-                'The name of the task we\'re running.',
-                null
-            ],
-            [
-                'task_class',
-                'l',
-               InputOption::VALUE_REQUIRED,
-                'The class to run.',
-                null
-            ],
-            [
-                'task_command',
-                'm',
-               InputOption::VALUE_REQUIRED,
-                'The task command to run (if task_class was not passed).',
-                null
-            ],
-            [
-                'task_command_arguments',
-                'a',
-               InputOption::VALUE_REQUIRED,
-                'The task command arguments to run.',
-                null
+                [
+                    'task_name',
+                    't',
+                   InputOption::VALUE_REQUIRED,
+                    'The name of the task we\'re running.',
+                    null
+                ],
+                [
+                    'task_class',
+                    'l',
+                   InputOption::VALUE_REQUIRED,
+                    'The class to run.',
+                    null
+                ],
+                [
+                    'task_command',
+                    'm',
+                   InputOption::VALUE_REQUIRED,
+                    'The task command to run (if task_class was not passed).',
+                    null
+                ],
+                [
+                    'task_command_arguments',
+                    'a',
+                   InputOption::VALUE_REQUIRED,
+                    'The task command arguments to run.',
+                    null
+                ],
             ]
-        ];
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function isLogFileRequired()
+    {
+        return true;
     }
 
     /**
@@ -91,14 +102,9 @@ class RunTaskCommand extends Tasker\Command
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $this->options = [
-                'task_name' => $input->getOption('task_name'),
-                'task_class' => $input->getOption('task_class'),
-                'task_command' => $input->getOption('task_command'),
-                'task_command_arguments' => $input->getOption('task_command_arguments'),
-            ];
+            $this->init($input, $output, ['log_file', 'task_class', 'task_name']);
 
-            Tasker\Task::factory($this->options['task_name'])
+            Tasker\Task::Factory($this->options['task_name'], $this->buildLogger())
                 ->setClass($this->options['task_class'])
                 ->setCommand($this->options['task_command'])
                 ->setCommandArgs((array)json_decode($this->options['task_command_arguments'], true))

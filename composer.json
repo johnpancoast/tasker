@@ -7,7 +7,8 @@
         "symfony/console": "dev-master",
         "symfony/yaml": "dev-master",
         "psr/log": "dev-master",
-        "mtdowling/cron-expression": "1.0.3"
+        "mtdowling/cron-expression": "~1.0.3",
+        "monolog/monolog": "~1.8.0"
     },
     "autoload": {
         "psr-4": {

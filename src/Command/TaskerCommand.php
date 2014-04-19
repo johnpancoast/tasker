@@ -21,7 +21,7 @@ use Shideon\Tasker;
  *
  * @author John Pancoast <shideon@gmail.com>
  */
-class TaskerCommand extends Tasker\Command
+class TaskerCommand extends Tasker\AbstractCommand
 {
     /**
      * {@inheritDoc}
@@ -52,15 +52,26 @@ class TaskerCommand extends Tasker\Command
      */
     protected function getConfigOptions()
     {
-        return [
+        return array_merge(
+            parent::getConfigOptions(true),
             [
-                'config',
-                'c',
-               InputOption::VALUE_REQUIRED,
-                'Config file.',
-                null
+                [
+                    'config',
+                    'c',
+                   InputOption::VALUE_REQUIRED,
+                    'Config file.',
+                    null
+                ],
             ]
-        ];
+        );
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function isLogFileRequired()
+    {
+        return true;
     }
 
     /**
@@ -68,13 +79,7 @@ class TaskerCommand extends Tasker\Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->options = [
-            'config' => $input->getOption('config'),
-        ];
-
-        if (!$this->options['config']) {
-            throw new \Exception('Must set --config.');
-        }
+        $this->init($input, $output, ['config']);
 
         $config = Tasker\Common::getConfigArray($this->options['config']);
 
@@ -94,7 +99,7 @@ class TaskerCommand extends Tasker\Command
             $tasks[] = $taskObj;
         }
 
-        $tasker = new Tasker\Tasker($tasks);
+        $tasker = new Tasker\Tasker($tasks, $this->buildLogger());
         $output->write($tasker->run());
     }
 }
