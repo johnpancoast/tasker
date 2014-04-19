@@ -79,29 +79,35 @@ class TaskerCommand extends Tasker\AbstractCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->init($input, $output, ['config']);
+        try {
+            $this->init($input, $output, ['config']);
 
-        $config = Tasker\Common::getConfigArray($this->options['config']);
+            $config = Tasker\Common::getConfigArray($this->options['config']);
 
-        $logger = $this->buildLogger();
+            $logger = $this->buildLogger();
 
-        foreach ($config['tasker']['tasks'] as $task)
-        {
-            $taskObj = new Tasker\Task($task['name'], $task['time'], $logger);
+            foreach ($config['tasker']['tasks'] as $task)
+            {
+                $taskObj = new Tasker\Task($task['name'], $task['time'], $logger);
 
-            if (isset($task['class'])) {
-                $taskObj->setClass($task['class']);
+                if (isset($task['class'])) {
+                    $taskObj->setClass($task['class']);
+                }
+
+                if (isset($task['command'])) {
+                    $taskObj->setCommand($task['command']);
+                    $taskObj->setArgument($task['command_args']);
+                }
+
+                $tasks[] = $taskObj;
             }
 
-            if (isset($task['command'])) {
-                $taskObj->setCommand($task['command']);
-                $taskObj->setArgument($task['command_args']);
-            }
+            $tasker = new Tasker\Tasker($tasks, $logger);
+            $output->write($tasker->run());
+        } catch (\Exception $e) {
+            $logger->log(Logger::CRITICAL, 'Exception encountered in '.get_class($this), $e);
 
-            $tasks[] = $taskObj;
+            throw $e;
         }
-
-        $tasker = new Tasker\Tasker($tasks, $logger);
-        $output->write($tasker->run());
     }
 }

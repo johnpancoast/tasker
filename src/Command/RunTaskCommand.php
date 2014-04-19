@@ -110,8 +110,7 @@ class RunTaskCommand extends Tasker\AbstractCommand
                 ->setCommandArgs((array)json_decode($this->options['task_command_arguments'], true))
                 ->run();
         } catch (\Exception $e) {
-
-            // TODO log it
+            $logger->log(Logger::CRITICAL, 'Exception encountered in '.get_class($this), $e);
 
             throw $e;
         }

@@ -69,36 +69,31 @@ class Tasker
      * Run main tasker functionality
      *
      * @access public
-     * @param bool $continuous Do we run scheduled jobs regularly?
-     * @todo I'm wondering if the continuous functionality should be moved out of here. Not sure yet.
      */
-    public function run($continuous = false)
+    public function run()
     {
-        while (true) {
-            $this->startMicroTime = microtime(true);
+        $this->startMicroTime = microtime(true);
+        $this->logger->log(Logger::DEBUG, 'Checking tasks that are due to run.');
 
-            foreach ($this->tasks as $task) {
-                if ($task->isDue()) {
-                    // run the job in the background.
-                    // need to allow asynchronous calls for this code
-                    // to be of any use.
-                    // TODO add ability to log program output to file
-                    // although I'm not sure if monolog would be enough there.
-                    $cmd = "nohup php ".$this->rootDir."console.php shideon:tasker:run_task ".Common::buildTaskCommandArgs($task)." > /dev/null &";
+        foreach ($this->tasks as $task) {
+            $this->logger->log(Logger::DEBUG, "Checking task '".$task->getName()."'");
 
-                    shell_exec($cmd);
-                }
+            if ($task->isDue()) {
+                $this->logger->log(Logger::DEBUG, "Task '".$task->getName()."' due to run: YES");
+
+                // run the job in the background.
+                // need to allow asynchronous calls for this code
+                // to be of any use.
+                // TODO add ability to log program output to file
+                // although I'm not sure if monolog would be enough there.
+                $cmd = "nohup php ".$this->rootDir."console.php shideon:tasker:run_task ".Common::buildTaskCommandArgs($task)." > /dev/null &";
+
+                $this->logger->log(Logger::INFO, "Running task '".$task->getName()."': $cmd");
+
+                shell_exec($cmd);
+            } else {
+                $this->logger->log(Logger::DEBUG, "Task '".$task->getName()."' due to run: NO");
             }
-
-            if ($continuous) {
-                while (microtime(true) - $this->startMicroTime < 1) {
-                    usleep(1000);
-                }
-
-                continue;
-            }
-
-            return;
         }
     }
 
