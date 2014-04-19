@@ -27,42 +27,62 @@ class RunTaskCommand extends Tasker\Command
     /**
      * {@inheritDoc}
      */
-    protected function configure()
+    protected function getConfigName()
     {
-        $this
-            ->setName('shideon:tasker:run_task')
-            ->setDescription('Run scheduled tasks.')
-            ->addOption(
-                'config',
-                'c',
-               InputOption::VALUE_REQUIRED,
-                'Config file.'
-            )
-            ->addOption(
+        return 'shideon:tasker:run_task';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getConfigDescription()
+    {
+        'Run scheduled tasks.';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getConfigArguments()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getConfigOptions()
+    {
+        return [
+            [
                 'task_name',
                 't',
                InputOption::VALUE_REQUIRED,
-                'The name of the task we\'re running.'
-            )
-            ->addOption(
+                'The name of the task we\'re running.',
+                null
+            ],
+            [
                 'task_class',
                 'l',
                InputOption::VALUE_REQUIRED,
-                'The class to run.'
-            )
-            ->addOption(
+                'The class to run.',
+                null
+            ],
+            [
                 'task_command',
                 'm',
                InputOption::VALUE_REQUIRED,
-                'The task command to run (if task_class was not passed).'
-            )
-            ->addOption(
+                'The task command to run (if task_class was not passed).',
+                null
+            ],
+            [
                 'task_command_arguments',
                 'a',
                InputOption::VALUE_REQUIRED,
-                'The task command arguments to run.'
-            )
-        ;
+                'The task command arguments to run.',
+                null
+            ]
+        ];
     }
 
     /**
@@ -72,7 +92,6 @@ class RunTaskCommand extends Tasker\Command
     {
         try {
             $this->options = [
-                'config' => $input->getOption('config'),
                 'task_name' => $input->getOption('task_name'),
                 'task_class' => $input->getOption('task_class'),
                 'task_command' => $input->getOption('task_command'),

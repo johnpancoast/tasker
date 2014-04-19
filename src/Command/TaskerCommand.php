@@ -26,18 +26,41 @@ class TaskerCommand extends Tasker\Command
     /**
      * {@inheritDoc}
      */
-    protected function configure()
+    protected function getConfigName()
     {
-        $this
-            ->setName('shideon:tasker')
-            ->setDescription('Run scheduled tasks.')
-            ->addOption(
+        return 'shideon:tasker';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getConfigDescription()
+    {
+        return 'Run scheduled tasks.';
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getConfigArguments()
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    protected function getConfigOptions()
+    {
+        return [
+            [
                 'config',
                 'c',
                InputOption::VALUE_REQUIRED,
-                'Config file.'
-            )
-        ;
+                'Config file.',
+                null
+            ]
+        ];
     }
 
     /**
