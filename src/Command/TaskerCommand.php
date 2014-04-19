@@ -83,9 +83,11 @@ class TaskerCommand extends Tasker\AbstractCommand
 
         $config = Tasker\Common::getConfigArray($this->options['config']);
 
+        $logger = $this->buildLogger();
+
         foreach ($config['tasker']['tasks'] as $task)
         {
-            $taskObj = new Tasker\Task($task['name'], $task['time']);
+            $taskObj = new Tasker\Task($task['name'], $task['time'], $logger);
 
             if (isset($task['class'])) {
                 $taskObj->setClass($task['class']);
@@ -99,7 +101,7 @@ class TaskerCommand extends Tasker\AbstractCommand
             $tasks[] = $taskObj;
         }
 
-        $tasker = new Tasker\Tasker($tasks, $this->buildLogger());
+        $tasker = new Tasker\Tasker($tasks, $logger);
         $output->write($tasker->run());
     }
 }

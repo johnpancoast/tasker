@@ -9,11 +9,10 @@
 
 namespace Shideon\Tasker;
 
-use Symfony\Component\Console\Output\OutputInterface;
-use Shideon\Tasker as TaskerBase;
-
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Config\Definition\Processor;
+
+use Monolog\Logger;
 
 /**
  * Main tasker functionality
@@ -29,6 +28,13 @@ class Tasker
      * @access private
      */
     private $tasks = [];
+
+    /**
+     * @var Logger $logger A monolog logger
+     *
+     * @access protected
+     */
+    protected $logger;
 
     /**
      * @var float The start microtime of a loop of work.
@@ -50,11 +56,13 @@ class Tasker
      *
      * @access public
      * @param array $tasks A collection of {@link Task objects}
+     * @param Logger $logger A monolog logger
      */
-    public function __construct(array $tasks)
+    public function __construct(array $tasks, Logger $logger)
     {
         $this->rootDir = __DIR__.'/../';
         $this->setTasks($tasks);
+        $this->setLogger($logger);
     }
 
     /**
@@ -99,15 +107,28 @@ class Tasker
      *
      * @access public
      * @param array $tasks A collection of {@link Task objects}
+     * @return self
      */
     public function setTasks(array $tasks)
     {
         foreach ($tasks as $task) {
-            if (!($task instanceof TaskerBase\Task)) {
+            if (!($task instanceof Task)) {
                 throw new \Exception('$tasks must be an array of Shideon\Tasker\Task objects.');
             }
         }
 
         $this->tasks = $tasks;
+    }
+
+    /**
+     * Set logger
+     *
+     * @access public
+     * @param Logger $logger A monolog logger
+     * @return self
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
     }
 }

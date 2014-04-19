@@ -11,7 +11,9 @@ namespace Shideon\Tasker;
 
 use Shideon\Tasker\TaskInterface;
 use Shideon\Tasker\Exception\TaskValidationException;
+
 use Cron\CronExpression;
+use Monolog\Logger;
 
 /**
  * A single task
@@ -55,16 +57,25 @@ class Task {
     private $commandArgs = [];
 
     /**
+     * @var Logger $logger A monolog logger
+     *
+     * @access protected
+     */
+    protected $logger;
+
+    /**
      * Constructor
      *
      * @access public
      * @param string $name The name of this task.
      * @param string $cronString The cron time string.
+     * @param Logger $logger A monolog logger
      */
-    public function __construct($name, $cronString = '')
+    public function __construct($name, $cronString = '', Logger $logger)
     {
         $this->setName($name);
         $this->setCronString($cronString);
+        $this->setLogger($logger);
     }
 
     /**
@@ -119,7 +130,7 @@ class Task {
     }
 
     /**
-     * Should we run?
+     * Are we do to run
      *
      * @access public
      * @return bool
@@ -266,5 +277,17 @@ class Task {
         $this->commandArgs = $commandArgs;
 
         return $this;
+    }
+
+    /**
+     * Set logger
+     *
+     * @access public
+     * @param Logger $logger A monolog logger
+     * @return self
+     */
+    public function setLogger(Logger $logger)
+    {
+        $this->logger = $logger;
     }
 }
