@@ -37,7 +37,7 @@ class RunTaskCommand extends Tasker\Command
      */
     protected function getConfigDescription()
     {
-        'Run scheduled tasks.';
+        return 'Run scheduled tasks.';
     }
 
     /**
