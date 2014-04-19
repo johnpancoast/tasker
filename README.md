@@ -1,4 +1,4 @@
 tasker
 ======
 
-A simple scheduler.
+A simple task scheduler.
