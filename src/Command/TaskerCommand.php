@@ -53,40 +53,12 @@ class TaskerCommand extends Tasker\AbstractCommand
     /**
      * {@inheritDoc}
      */
-    protected function getConfigOptions()
-    {
-        return array_merge(
-            parent::getConfigOptions(),
-            [
-                [
-                    'config',
-                    'c',
-                   InputOption::VALUE_REQUIRED,
-                    'Config file.',
-                    null
-                ],
-            ]
-        );
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function isLogFileRequired()
-    {
-        return true;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $this->init($input, $output, ['config']);
+            $this->init($input, $output);
 
             $logger = $this->buildLogger();
-
             $logger->log(Logger::DEBUG, 'Beginning tasker command.');
 
             $config = Tasker\Common::getConfigArray($this->options['config']);
@@ -111,7 +83,9 @@ class TaskerCommand extends Tasker\AbstractCommand
 
             $tasker = new Tasker\Tasker($tasks, $logger);
 
-            if ($this->isLogFileRequired()) {
+            $requiredOptions = $this->getRequiredOptions();
+
+            if (array_search('log_file', $requiredOptions) !== false) {
                 $tasker->setLogFile($this->options['log_file']);
                 $tasker->setLogLevel($this->options['log_level']);
             }

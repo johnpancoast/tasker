@@ -94,9 +94,9 @@ class RunTaskCommand extends Tasker\AbstractCommand
     /**
      * {@inheritDoc}
      */
-    protected function isLogFileRequired()
+    protected function getRequiredOptions()
     {
-        return true;
+        return array_merge(parent::getRequiredOptions(), ['task_class', 'task_name']);
     }
 
     /**
@@ -105,7 +105,7 @@ class RunTaskCommand extends Tasker\AbstractCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         try {
-            $this->init($input, $output, ['task_class', 'task_name']);
+            $this->init($input, $output);
             $logger = $this->buildLogger();
 
             $logger->log(Logger::DEBUG, "Running task '".$this->options['task_name']."'. Calling Shideon\Tasker\Task.");

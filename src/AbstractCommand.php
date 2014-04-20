@@ -81,12 +81,65 @@ abstract class AbstractCommand extends ConsoleCommand
     abstract protected function getConfigArguments();
 
     /**
-     * Is a log file required
+     * Get command options
      *
      * @access protected
-     * @return bool
+     * @return array of arguments suitable for {@link Symfony\Component\Console\Command\Command::addOption()}
      */
-    abstract protected function isLogFileRequired();
+    protected function getConfigOptions()
+    {
+        // note that we (as a lib) require these fields. This is for 2 reasons:
+        // config = To work standalone we need to allow configs to be
+        // passed to read the tasks that are to be run. A framework's
+        // implementation (extension) may define it's tasks differently
+        // and thus, this method is here to be overridden.
+        // log_file = As a standalone lib, we instantiate our own
+        // monolog logger but allow the command client/caller to define
+        // where the log file lies.
+        return [
+            [
+                'config',
+                'c',
+               InputOption::VALUE_REQUIRED,
+                'Config file.',
+                null
+            ],
+            [
+                'log_file',
+                'f',
+               InputOption::VALUE_REQUIRED,
+               'Log file',
+                null
+            ],
+            [
+                'log_level',
+                'e',
+               InputOption::VALUE_REQUIRED,
+               'Log level',
+                null
+            ]
+        ];
+    } 
+
+    /**
+     * Required options.
+     *
+     * Defines the options that are required. We do this because symfony
+     * follows some standard that somehow dictates that their options must
+     * be "optional". The functionality we need is different in
+     * that we need named args that are required. This provides that.
+     *
+     * @access protected
+     * @return array Return empty array to imply that nothing is required.
+     */
+    protected function getRequiredOptions()
+    {
+        // see comments inside {@link self::getConfigOptions()}
+        return [
+            'config',
+            'log_file'
+        ];
+    }
 
     /**
      * {@inheritDoc}
@@ -107,41 +160,29 @@ abstract class AbstractCommand extends ConsoleCommand
     }
 
     /**
-     * Get command options
+     * Initialize
+     *
+     * Set internal vars:
+     * {@link self::input}, {@link self::output},
+     * {@link self::arguments}, {@link self::options}
      *
      * @access protected
-     * @return array of arguments suitable for {@link Symfony\Component\Console\Command\Command::addOption()}
+     * @param InputInterface $input An InputInterface instance
+     * @param OutputInterface $output An OutputInterface instance
+     * @return void
      */
-    protected function getConfigOptions()
+    protected function init(InputInterface $input, OutputInterface $output)
     {
-        // ATM, all that's expected is the below but the code is
-        // assuming that the future will expect more at this layer.
-        $options = [];
+        $this->input = $input;
+        $this->output = $output;
 
-        if ($this->isLogFileRequired()) {
-            $options = array_merge(
-                $options,
-                [
-                    [
-                        'log_file',
-                        'f',
-                       InputOption::VALUE_REQUIRED,
-                       'Log file',
-                        null
-                    ],
-                    [
-                        'log_level',
-                        'e',
-                       InputOption::VALUE_REQUIRED,
-                       'Log level',
-                        null
-                    ]
-                ]
-            );
-        }
+        // pull args and options from input, allow methods to be
+        // overridden so children can define functionality.
+        $this->arguments = $this->getInputArguments($input);
+        $this->options = $this->getInputOptions($input);
 
-        return $options;
-    } 
+        $this->validateOptions($this->getRequiredOptions());
+    }
 
     /**
      * Build our logger
@@ -159,36 +200,6 @@ abstract class AbstractCommand extends ConsoleCommand
         $logger->pushHandler(new StreamHandler($this->options['log_file'], $this->options['log_level'] ?: Logger::INFO));;
 
         return $logger;
-    }
-
-    /**
-     * Initialize
-     *
-     * Set internal vars:
-     * {@link self::input}, {@link self::output},
-     * {@link self::arguments}, {@link self::options}
-     *
-     * @access protected
-     * @param InputInterface $input An InputInterface instance
-     * @param OutputInterface $output An OutputInterface instance
-     * @param array $requiredOptions Required options (since we sometime need named args that are required and console doesn't allow this)
-     * @return void
-     */
-    protected function init(InputInterface $input, OutputInterface $output, array $requiredOptions = [])
-    {
-        $this->input = $input;
-        $this->output = $output;
-
-        // pull args and options from input, allow methods to be
-        // overridden so children can define functionality.
-        $this->arguments = $this->getInputArguments($input);
-        $this->options = $this->getInputOptions($input);
-
-        if ($this->isLogFileRequired()) {
-            $requiredOptions[] = 'log_file';
-        }
-
-        $this->validateOptions($requiredOptions);
     }
 
     /**
@@ -222,6 +233,7 @@ abstract class AbstractCommand extends ConsoleCommand
     {
         return $input->getOptions();
     }
+
 
     /**
      * Validate options
