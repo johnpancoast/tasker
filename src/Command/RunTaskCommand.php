@@ -66,27 +66,6 @@ class RunTaskCommand extends Tasker\AbstractCommand
                     'The name of the task we\'re running.',
                     null
                 ],
-                [
-                    'task_class',
-                    'l',
-                   InputOption::VALUE_REQUIRED,
-                    'The class to run.',
-                    null
-                ],
-                [
-                    'task_command',
-                    'm',
-                   InputOption::VALUE_REQUIRED,
-                    'The task command to run (if task_class was not passed).',
-                    null
-                ],
-                [
-                    'task_command_arguments',
-                    'a',
-                   InputOption::VALUE_REQUIRED,
-                    'The task command arguments to run.',
-                    null
-                ],
             ]
         );
     }
@@ -96,12 +75,7 @@ class RunTaskCommand extends Tasker\AbstractCommand
      */
     protected function getRequiredOptions()
     {
-        $options = array_merge(parent::getRequiredOptions(), ['task_class', 'task_name']);
-
-        $logger = $this->buildLogger();
-        $logger->log(Logger::DEBUG, 'RunTaskCommand required command options: '.print_r($options, true));
-
-        return $options;
+        return array_merge(parent::getRequiredOptions(), ['task_name']);
     }
 
     /**
@@ -115,11 +89,19 @@ class RunTaskCommand extends Tasker\AbstractCommand
 
             $logger->log(Logger::DEBUG, "Running task '".$this->options['task_name']."'. Calling Shideon\Tasker\Task.");
 
-            Tasker\Task::Factory($this->options['task_name'], '', $logger)
-                ->setClass($this->options['task_class'])
-                ->setCommand($this->options['task_command'])
-                ->setCommandArgs((array)json_decode($this->options['task_command_arguments'], true))
-                ->run();
+            $config = Tasker\Common::getConfigArray($this->options['config_file']);
+
+            // get the task we're working with
+            foreach ($config['tasker']['tasks'] as $task)
+            {
+                if (isset($task['name']) && $task['name'] == $this->options['task_name']) {
+                    Tasker\Task::Factory($this->options['task_name'], '', $logger)
+                        ->setFromArray($task)
+                        ->run();
+
+                    break;
+                }
+            }
         } catch (\Exception $e) {
             // if we don't have a logger (due to exception being thrown before
             // it's instantiatied) then attempt to build one. ignore its

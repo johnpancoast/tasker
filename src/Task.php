@@ -161,6 +161,28 @@ class Task {
     }
 
     /**
+     * Set object params from array
+     *
+     * @access public
+     * @param array $task Array to set class param from.
+     * @return self
+     */
+    public function setFromArray(array $task)
+    {
+        if (isset($task['name'])) {
+            $this->setName($task['name']);
+        }
+        if (isset($task['time'])) {
+            $this->setCronString($task['time']);
+        }
+        if (isset($task['class'])) {
+            $this->setClass($task['class']);
+        }
+
+        return $this;
+    }
+
+    /**
      * Gets the value of name.
      *
      * @return string Task name
