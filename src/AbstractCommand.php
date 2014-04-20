@@ -105,7 +105,7 @@ abstract class AbstractCommand extends ConsoleCommand
         // where the log file lies.
         return [
             [
-                'config',
+                'config_file',
                 'c',
                InputOption::VALUE_REQUIRED,
                 'Config file.',
@@ -143,7 +143,7 @@ abstract class AbstractCommand extends ConsoleCommand
     {
         // see comments inside {@link self::getConfigOptions()}
         return [
-            'config',
+            'config_file',
             'log_file'
         ];
     }

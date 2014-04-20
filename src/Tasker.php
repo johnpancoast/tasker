@@ -38,30 +38,6 @@ class Tasker
     protected $logger;
 
     /**
-     * @var string $logFile The file we're logging to
-     *
-     * This is used for the subsequent call to run the task.
-     * Note that this is only relevant when the monolog logger
-     * is set internally in the lib. If the dev has extended
-     * then this functionality may not be relevant (code smell maybe but not really).
-     *
-     * @access protected
-     */
-    protected $logFile;
-
-    /**
-     * @var string $logLevel Set log level
-     *
-     * This is used for the subsequent call to run the task.
-     * Note that this is only relevant when the monolog logger
-     * is set internally in the lib. If the dev has extended
-     * then this functionality may not be relevant (code smell maybe but not really).
-     *
-     * @access protected
-     */
-    protected $logLevel;
-
-    /**
      * @var float The start microtime of a loop of work.
      *
      * @access private
@@ -91,44 +67,123 @@ class Tasker
     }
 
     /**
-     * Run main tasker functionality
+     * Get tasks that are due to run
      *
      * @access public
+     * @return array A list of {@link Task} objects.
      */
-    public function run()
+    public function getDueTasks()
     {
-        $this->startMicroTime = microtime(true);
-        $this->logger->log(Logger::INFO, 'Checking tasks that are due to run.');
+        $this->logger->log(Logger::DEBUG, 'Checking tasks that are due to run. '.count($this->tasks).' total tasks.');
+
+        $t = [];
 
         foreach ($this->tasks as $task) {
+            $this->logger->log(Logger::DEBUG, 'Checking on "'.$task->getName().'" ('.$task->getCronString().')');
+
             if ($task->isDue()) {
-                $this->logger->log(Logger::DEBUG, "Task '".$task->getName()."' due to run: YES");
+                $t[] = $task;
 
-                // run the job in the background.
-                // need to allow asynchronous calls for this code
-                // to be of any use.
-                // TODO add ability to log program output to file
-                // although I'm not sure if monolog would be enough there.
-                $cmd = "php ".$this->rootDir."console.php shideon:tasker:run_task ".Common::buildTaskCommandArgs($task);
-
-                if ($this->logFile) {
-                    $cmd .= " --log_file='".$this->logFile."'";
-                }
-
-                if ($this->logLevel) {
-                    $cmd .= " --log_level='".$this->logLevel."'";
-                }
-
-                $this->logger->log(Logger::INFO, "Running task '".$task->getName()."' in background: $cmd");
-
-                // note that we use shell_exec instead of symfony's
-                // Process because it's causing issues with
-                // sub process having open file hdnle.
-                shell_exec("nohup $cmd > /dev/null &");
+                $this->logger->log(Logger::DEBUG, '"'.$task->getName().'" IS set to run');
             } else {
-                $this->logger->log(Logger::DEBUG, "Task '".$task->getName()."' due to run: NO");
+                $this->logger->log(Logger::DEBUG, '"'.$task->getName().'" is not set to run');
             }
         }
+
+        return $t;
+    }
+
+    /**
+     * Run main tasker functionality
+     *
+     * Note that the optional params are here because the lib expects this
+     * functionality but if a developer were to extend the lib, these may
+     * no longer be relevant. For more on this, see the comment that's inside
+     * {@link Shideon\Tasker\AbstractCommand::getConfigOptions()}
+     *
+     * @access public
+     * @param string $configFile Config file to send to command.
+     * @param string $logFile Log file to send to command.
+     * @param string $logLevel Log level to pass to command.
+     * @uses self::getDueTasks()
+     * @uses self::callRunTask()
+     */
+    public function run($configFile = null, $logFile = null, $logLevel = null)
+    {
+        $this->startMicroTime = microtime(true);
+
+        foreach ($this->getDueTasks() as $task) {
+            $this->callRunTask($task, true, $configFile, $logFile, $logLevel);
+        }
+    }
+
+    /**
+     * Call the run task command.
+     *
+     * Note that the optional params are here because the lib expects this
+     * functionality but if a developer were to extend the lib, these may
+     * no longer be relevant. For more on this, see the comment that's inside
+     * {@link Shideon\Tasker\AbstractCommand::getConfigOptions()}
+     *
+     * @access public
+     * @param Task $task Task object
+     * @param bool $async Run asynchronously
+     * @param string $configFile Config file to send to command.
+     * @param string $logFile Log file to send to command.
+     * @param string $logLevel Log level to pass to command.
+     */
+    public function callRunTask(Task $task, $async = true, $configFile = null, $logFile = null, $logLevel = null)
+    {
+        $cmd = $this->buildRunTaskCommand($task, $async, $configFile, $logFile, $logLevel);
+
+        $this->logger->log(Logger::INFO, "Running task '".$task->getName()."' in background: $cmd");
+
+        // note that we use shell_exec instead of symfony's
+        // Process because it's causing issues with
+        // sub process having open file hdnle.
+        shell_exec($cmd);
+    }
+
+    /**
+     * Generate command for running a task
+     *
+     * Note that the optional params are here because the lib expects this
+     * functionality but if a developer were to extend the lib, these may
+     * no longer be relevant. For more on this, see the comment that's inside
+     * {@link Shideon\Tasker\AbstractCommand::getConfigOptions()}
+     *
+     * @access public
+     * @param Task $task Task object
+     * @param bool $includeAsync Include parts of the command for asynchronousity.
+     * @param string $configFile Config file to send to command.
+     * @param string $logFile Log file to send to command.
+     * @param string $logLevel Log level to pass to command.
+     */
+    public function buildRunTaskCommand(Task $task, $includeAsync = true, $configFile = null, $logFile = null, $logLevel = null)
+    {
+        $cmd = '';
+
+        if ($includeAsync) {
+            $cmd .= 'nohup';
+        }
+
+        $cmd .= " php ".$this->rootDir."console.php shideon:tasker:run_task ".Common::buildTaskCommandArgs($task);
+
+        if ($configFile) {
+            $cmd .= " --config_file='$configFile'";
+        }
+        if ($logFile) {
+            $cmd .= " --log_file='$logFile'";
+        }
+        if ($logLevel) {
+            $cmd .= " --log_level='$logLevel'";
+        }
+
+        if ($includeAsync) {
+            $cmd .= ' > /dev/null &';
+        }
+
+        return $cmd;
     }
 
     /**
@@ -159,37 +214,5 @@ class Tasker
     public function setLogger(Logger $logger)
     {
         $this->logger = $logger;
-    }
-
-    /**
-     * Set file we're logging to
-     *
-     * This is used for the subsequent call to run the task.
-     * Note that this is only relevant when the monolog logger
-     * is set internally in the lib. If the dev has extended
-     * then this functionality may not be relevant (code smell maybe but not really).
-     *
-     * @access public
-     * @param string $logFile Set log file.
-     */
-    public function setLogFile($logFile)
-    {
-        $this->logFile = $logFile;
-    }
-
-    /**
-     * Set log level
-     *
-     * This is used for the subsequent call to run the task.
-     * Note that this is only relevant when the monolog logger
-     * is set internally in the lib. If the dev has extended
-     * then this functionality may not be relevant (code smell maybe but not really).
-     *
-     * @access public
-     * @param string $logFile Set log file.
-     */
-    public function setLogLevel($logLevel)
-    {
-        $this->logLevel = $logLevel;
     }
 }

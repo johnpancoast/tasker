@@ -61,7 +61,7 @@ class TaskerCommand extends Tasker\AbstractCommand
             $logger = $this->buildLogger();
             $logger->log(Logger::DEBUG, 'Beginning tasker command.');
 
-            $config = Tasker\Common::getConfigArray($this->options['config']);
+            $config = Tasker\Common::getConfigArray($this->options['config_file']);
 
             foreach ($config['tasker']['tasks'] as $task)
             {
@@ -83,14 +83,26 @@ class TaskerCommand extends Tasker\AbstractCommand
 
             $tasker = new Tasker\Tasker($tasks, $logger);
 
+            // for passing to tasker->run(). our lib requires these values
+            // but extenders may not need them so they're optional
+            // and this based solely on their existence in the command
+            // options.
+            $configFile = null;
+            $logFile = null;
+            $logLevel = null;
+
             $requiredOptions = $this->getRequiredOptions();
 
-            if (array_search('log_file', $requiredOptions) !== false) {
-                $tasker->setLogFile($this->options['log_file']);
-                $tasker->setLogLevel($this->options['log_level']);
+            if (array_search('config_file', $requiredOptions) !== false) {
+                $configFile = $this->options['config_file'];
             }
 
-            $output->write($tasker->run());
+            if (array_search('log_file', $requiredOptions) !== false) {
+                $logFile = $this->options['log_file'];
+                $logLevel = $this->options['log_level'];
+            }
+
+            $output->write($tasker->run($configFile, $logFile, $logLevel));
         } catch (\Exception $e) {
             // if we don't have a logger (due to exception being thrown before
             // it's instantiatied) then attempt to build one. ignore its
