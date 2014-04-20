@@ -167,7 +167,7 @@ class Tasker
             $cmd .= 'nohup';
         }
 
-        $cmd .= " php ".$this->rootDir."console.php shideon:tasker:run_task ".$this->buildRunTaskCommandArgs($task);
+        $cmd .= " php ".$this->rootDir."console.php shideon:tasker:run_task --task_name='".$task->getName()."'";
 
         if ($configFile) {
             $cmd .= " --config_file='$configFile'";
@@ -182,21 +182,6 @@ class Tasker
         if ($includeAsync) {
             $cmd .= ' > /dev/null &';
         }
-
-        return $cmd;
-    }
-
-    /**
-     * Given a {@link Task} object, make command arguments for the run task command.
-     *
-     * @access public
-     * @static
-     * @param Task
-     * @return string
-     */
-    public static function buildRunTaskCommandArgs(Task $task)
-    {
-        $cmd = "--task_name='".$task->getName()."'";
 
         return $cmd;
     }
