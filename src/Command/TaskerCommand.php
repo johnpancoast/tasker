@@ -85,7 +85,7 @@ class TaskerCommand extends Tasker\AbstractCommand
 
             // for passing to tasker->run(). our lib requires these values
             // but extenders may not need them so they're optional
-            // and this based solely on their existence in the command
+            // and this is determined by their existence in the command
             // options.
             $configFile = null;
             $logFile = null;
