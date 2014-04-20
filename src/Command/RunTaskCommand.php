@@ -96,7 +96,12 @@ class RunTaskCommand extends Tasker\AbstractCommand
      */
     protected function getRequiredOptions()
     {
-        return array_merge(parent::getRequiredOptions(), ['task_class', 'task_name']);
+        $options = array_merge(parent::getRequiredOptions(), ['task_class', 'task_name']);
+
+        $logger = $this->buildLogger();
+        $logger->log(Logger::DEBUG, 'RunTaskCommand required command options: '.print_r($options, true));
+
+        return $options;
     }
 
     /**
@@ -115,13 +120,21 @@ class RunTaskCommand extends Tasker\AbstractCommand
                 ->setCommand($this->options['task_command'])
                 ->setCommandArgs((array)json_decode($this->options['task_command_arguments'], true))
                 ->run();
-        } catch (RequiredCommandOptionException $e) {
-            // we cannot log these exceptions since we've
-            // failed at option validation and we need options
-            // for a logger to be created.
-            throw $e;
         } catch (\Exception $e) {
-            $logger->log(Logger::CRITICAL, "Running task '".$this->options['task_name']."' encountered exception in ".get_class($this), [$e, 'trace' => $e->getTraceAsString()]);
+            // if we don't have a logger (due to exception being thrown before
+            // it's instantiatied) then attempt to build one. ignore its
+            // exceptions.
+            if (!isset($logger) || !($logger instanceof Logger)) {
+                try {
+                    $logger = $this->buildLogger();
+                } catch (\Exception $e) {
+                    // ignore
+                }
+            }
+
+            if (isset($logger) && $logger instanceof Logger) {
+                $logger->log(Logger::CRITICAL, "Running task '".$this->options['task_name']."' encountered exception in ".get_class($this), [$e, 'trace' => $e->getTraceAsString()]);
+            }
 
             throw $e;
         }

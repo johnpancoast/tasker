@@ -54,6 +54,13 @@ abstract class AbstractCommand extends ConsoleCommand
     protected $options = [];
 
     /**
+     * @var Logger The monolog logger
+     *
+     * @access private
+     */
+    private $logger;
+
+    /**
      * Get command name
      *
      * @abstract
@@ -192,14 +199,16 @@ abstract class AbstractCommand extends ConsoleCommand
      */
     protected function buildLogger()
     {
-        if (!isset($this->options['log_file'])) {
-            throw new \Exception('To build the lib\'s logger, we need a log file to log to.');
+        if (!$this->logger) {
+            if (!isset($this->options['log_file'])) {
+                throw new \Exception('To build the lib\'s logger, we need a log file to log to.');
+            }
+
+            $this->logger = new Logger('shideon_tasker_main');
+            $this->logger->pushHandler(new StreamHandler($this->options['log_file'], $this->options['log_level'] ?: Logger::INFO));;
         }
 
-        $logger = new Logger('shideon_tasker_main');
-        $logger->pushHandler(new StreamHandler($this->options['log_file'], $this->options['log_level'] ?: Logger::INFO));;
-
-        return $logger;
+        return $this->logger;
     }
 
     /**
@@ -245,7 +254,7 @@ abstract class AbstractCommand extends ConsoleCommand
     {
         foreach ($requiredOptions as $key) {
             if (!array_key_exists($key, $this->options) || empty($this->options[$key])) {
-                throw new Exception\RequiredCommandOptionException("Must set the --$key option.");
+                throw new Exception\RequiredCommandOptionException("Must set the --$key option.", $key);
             }
         }
     }
