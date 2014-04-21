@@ -140,7 +140,7 @@ class Tasker
 
         // note that we use shell_exec instead of symfony's
         // Process because it's causing issues with
-        // sub process having open file hdnle.
+        // sub process having open file handle.
         shell_exec($cmd);
     }
 
@@ -167,7 +167,7 @@ class Tasker
             $cmd .= 'nohup';
         }
 
-        $cmd .= " php ".$this->rootDir."console.php shideon:tasker:run_task --task_name='".$task->getName()."'";
+        $cmd .= " bin/tasker shideon:tasker:run_task --task_name='".$task->getName()."'";
 
         if ($configFile) {
             $cmd .= " --config_file='$configFile'";
