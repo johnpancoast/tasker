@@ -205,7 +205,7 @@ abstract class AbstractCommand extends ConsoleCommand
             }
 
             $this->logger = new Logger('shideon_tasker_main');
-            $this->logger->pushHandler(new StreamHandler($this->options['log_file'], $this->options['log_level'] ?: Logger::INFO));;
+            $this->logger->pushHandler(new StreamHandler(Common::getAbsolutePath($this->options['log_file']), $this->options['log_level'] ?: Logger::INFO));;
         }
 
         return $this->logger;

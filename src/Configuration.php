@@ -52,6 +52,7 @@ class Configuration implements ConfigurationInterface
             ->prototype('array')
                 ->children()
                     ->scalarNode('name')->cannotBeEmpty()->end()
+                    ->scalarNode('file')->cannotBeEmpty()->end()
                     ->scalarNode('time')->cannotBeEmpty()->end()
                     ->scalarNode('class')->cannotBeEmpty()->end()
                     ->arrayNode('command')

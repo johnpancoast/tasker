@@ -10,6 +10,7 @@
 namespace Shideon\Tasker;
 
 use Shideon\Tasker\Exception\TaskValidationException;
+use Monolog\Logger;
 
 /**
  * Task interface for client task classes
@@ -17,5 +18,11 @@ use Shideon\Tasker\Exception\TaskValidationException;
  * @author John Pancoast <shideon@gmail.com>
  */
 interface TaskInterface {
-    public function run();
+    /**
+     * Functionality for your class.
+     *
+     * @access public
+     * @param Logger $logger A monolog logger.
+     */
+    public function run(Logger $logger);
 }

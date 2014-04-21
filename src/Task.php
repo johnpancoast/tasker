@@ -117,6 +117,14 @@ class Task {
      */
     private function runClass()
     {
+        if ($this->file) {
+            if (!is_readable($this->file)) {
+                throw new \Exception('Task class file not readable: '.$this->file);
+            }
+
+            require $this->file;
+        }
+
         if (!class_exists($this->class)) {
             throw new \Exception('Task class '.$this->class.' does not exist.');
         }
@@ -127,7 +135,7 @@ class Task {
             throw new \Exception('Task must implement Shideon\Tasker\TaskInterface');
         } 
 
-        $obj->run();
+        $obj->run($this->logger);
     }
 
     /**
@@ -177,6 +185,9 @@ class Task {
         }
         if (isset($task['class'])) {
             $this->setClass($task['class']);
+        }
+        if (isset($task['file'])) {
+            $this->setFile($task['file']);
         }
 
         return $this;
@@ -229,6 +240,31 @@ class Task {
 
         return $this;
     }
+
+    /**
+     * Gets the value of file.
+     *
+     * @return string Task file
+     */
+    public function getFile()
+    {
+        return $this->file;
+    }
+    
+    /**
+     * Sets the value of file.
+     *
+     * @param string $file Set the file
+     *
+     * @return self
+     */
+    public function setFile($file)
+    {
+        $this->file = $file;
+
+        return $this;
+    }
+
 
     /**
      * Gets the value of class.
