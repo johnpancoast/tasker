@@ -63,7 +63,7 @@ Logging
 -------
 Tasker uses [monolog](https://github.com/Seldaek/monolog) to handle logging and it logs to the file that you specify with the `--log_file` option.
 
-The lib creares a `StreamHandler` handler at a log level of `INFO` (200)  You can also pass the `--log_level` option to define the level of logging you want. It must be a number and be equal to one of the class' [log level constants](https://github.com/Seldaek/monolog/blob/master/src/Monolog/Logger.php#L29).
+The lib creares a `StreamHandler` handler at a log level of `INFO (200)`. You can also pass the `--log_level` option to define the level of logging you want. It must be a number and be equal to one of the class' [log level constants](https://github.com/Seldaek/monolog/blob/master/src/Monolog/Logger.php#L29).
 
 There is currently no way to define different or additional handlers for the logging as it would be extra work to handle from CLI. You can see the `Extending` section though.
 
@@ -73,6 +73,10 @@ The commands `TaskerCommand` (shideon:tasker) and `RunTaskCommand` (shideon:task
 
 If doing this, remember that `bin/console` will not be aware of your new commands. You will probably want to create a new console that loads your commands then have your system's scheduler call on that instead of the default console. For more on this, see Symfony's docs for the [console component](http://symfony.com/doc/current/components/console/introduction.html).
 
-LICENSE
+Copyright
+---------
+Copyright (c) 2014 John Pancoast <shideon@gmail.com>
+
+License
 -------
 The MIT License (MIT)
