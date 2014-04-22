@@ -1,6 +1,6 @@
 <?php
 /**
- * Command to execute scheduled jobs either once or continuously as a daemon.
+ * Command to execute scheduled jobs.
  *
  * @copyright (c) 2014 John Pancoast
  * @author John Pancoast <shideon@gmail.com>
@@ -20,7 +20,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Monolog\Logger;
 
 /**
- * Command to execute scheduled jobs once or continuously as a daemon.
+ * Command to execute scheduled jobs.
  *
  * @author John Pancoast <shideon@gmail.com>
  */
