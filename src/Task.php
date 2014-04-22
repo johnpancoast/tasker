@@ -96,27 +96,104 @@ class Task {
     /**
      * Run task
      *
+     * Note that the optional params are here because the lib expects this
+     * functionality but if a developer were to extend the lib, these may
+     * no longer be relevant. For more on this, see the comment that's inside
+     * {@link Shideon\Tasker\AbstractCommand::getConfigOptions()}
+     *
      * @access public
+     * @param bool $async Run asynchronously
+     * @param string $configFile Config file to send to command.
+     * @param string $logFile Log file to send to command.
+     * @param string $logLevel Log level to pass to command.
      */
-    public function run()
+    public function run($async, $configFile = null, $logFile = null, $logLevel = null)
     {
         $this->validate();
 
-        if ($this->class) {
-            $this->runClass();
-        } elseif ($this->command) {
-            $this->runCommand();
-        }
+        $cmd = $this->buildRunCommand($async, $configFile, $logFile, $logLevel);
+
+        $this->logger->log(Logger::INFO, "Running task '".$this->getName()."' in background: $cmd");
+
+        // note that we use shell_exec instead of symfony's
+        // Process because it's causing issues with
+        // sub process having open file handle.
+        shell_exec($cmd);
     }
+
+    /**
+     * Generate command for running a task
+     *
+     * Note that the optional params are here because the lib expects this
+     * functionality but if a developer were to extend the lib, these may
+     * no longer be relevant. For more on this, see the comment that's inside
+     * {@link Shideon\Tasker\AbstractCommand::getConfigOptions()}
+     *
+     * @access public
+     * @param bool $includeAsync Include parts of the command for asynchronousity.
+     * @param string $configFile Config file to send to command.
+     * @param string $logFile Log file to send to command.
+     * @param string $logLevel Log level to pass to command.
+     */
+    public function buildRunCommand($includeAsync = true, $configFile = null, $logFile = null, $logLevel = null)
+    {
+        $this->validate();
+
+        $cmd = '';
+
+        if ($includeAsync) {
+            $cmd .= 'nohup';
+        }
+
+        if ($this->getClass()) {
+            $cmd .= " bin/console shideon:tasker:run_task --task_name='".$this->getName()."'";
+
+            if ($configFile) {
+                $cmd .= " --config_file='$configFile'";
+            }
+            if ($logFile) {
+                $cmd .= " --log_file='$logFile'";
+            }
+            if ($logLevel) {
+                $cmd .= " --log_level='$logLevel'";
+            }
+        } elseif ($this->getCommand()) {
+            $c = $this->getCommand();
+
+            if ((int)strpos($c, '$console') === (int)0) {
+                $cmd .= ' '.str_replace('$console', $_SERVER['argv'][0], $c);
+
+                if ($configFile) {
+                    $cmd .= " --config_file='$configFile'";
+                }
+                if ($logFile) {
+                    $cmd .= " --log_file='$logFile'";
+                }
+                if ($logLevel) {
+                    $cmd .= " --log_level='$logLevel'";
+                }
+            } else {
+                $cmd .= ' '.$c;
+            }
+        }
+
+        if ($includeAsync) {
+            $cmd .= ' > /dev/null &';
+        }
+
+        return $cmd;
+    }
+
 
     /**
      * Run task from class
      *
-     * @access private
-     * @return 
+     * @access public
      */
-    private function runClass()
+    public function callClass()
     {
+        $this->validate();
+
         if ($this->file) {
             if (!is_readable($this->file)) {
                 throw new \Exception('Task class file not readable: '.$this->file);
@@ -135,7 +212,7 @@ class Task {
             throw new \Exception('Task must implement Shideon\Tasker\TaskInterface');
         } 
 
-        $obj->run($this->logger);
+        $obj->run($this, $this->logger);
     }
 
     /**

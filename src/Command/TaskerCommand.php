@@ -59,7 +59,7 @@ class TaskerCommand extends Tasker\AbstractCommand
             $this->init($input, $output);
 
             $logger = $this->buildLogger();
-            $logger->log(Logger::DEBUG, 'Beginning tasker command.');
+            $logger->log(Logger::INFO, 'Beginning tasker.');
 
             $config = Tasker\Common::getConfigArray($this->options['config_file']);
 
@@ -73,7 +73,6 @@ class TaskerCommand extends Tasker\AbstractCommand
 
                 if (isset($task['command'])) {
                     $taskObj->setCommand($task['command']);
-                    $taskObj->setArgument($task['command_args']);
                 }
 
                 $tasks[] = $taskObj;

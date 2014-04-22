@@ -97,7 +97,7 @@ class RunTaskCommand extends Tasker\AbstractCommand
                 if (isset($task['name']) && $task['name'] == $this->options['task_name']) {
                     Tasker\Task::Factory($this->options['task_name'], '', $logger)
                         ->setFromArray($task)
-                        ->run();
+                        ->callClass();
 
                     break;
                 }

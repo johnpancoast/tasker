@@ -52,17 +52,10 @@ class Configuration implements ConfigurationInterface
             ->prototype('array')
                 ->children()
                     ->scalarNode('name')->cannotBeEmpty()->end()
-                    ->scalarNode('file')->cannotBeEmpty()->end()
                     ->scalarNode('time')->cannotBeEmpty()->end()
                     ->scalarNode('class')->cannotBeEmpty()->end()
-                    /* coming soon
-                    ->arrayNode('command')
-                        ->cannotBeEmpty()
-                        ->children()
-                            ->scalarNode('name')->isRequired()->cannotBeEmpty()->end()
-                        ->end()
-                    ->end()
-                    */
+                    ->scalarNode('file')->cannotBeEmpty()->end()
+                    ->scalarNode('command')->cannotBeEmpty()->end()
                 ->end()
             ->end();
 

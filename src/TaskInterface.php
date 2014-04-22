@@ -22,7 +22,8 @@ interface TaskInterface {
      * Functionality for your class.
      *
      * @access public
+     * @param Task $task The tasker task object.
      * @param Logger $logger A monolog logger.
      */
-    public function run(Logger $logger);
+    public function run(Task $task, Logger $logger);
 }
