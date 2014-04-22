@@ -160,7 +160,7 @@ class Task {
         } elseif ($this->getCommand()) {
             $c = $this->getCommand();
 
-            if ((int)strpos($c, '$console') === (int)0) {
+            if (strpos($c, '$console') !== false) {
                 $cmd .= ' '.str_replace('$console', $_SERVER['argv'][0], $c);
 
                 if ($configFile) {
