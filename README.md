@@ -74,4 +74,4 @@ If doing this, remember that `bin/console` will not be aware of your new command
 
 LICENSE
 -------
-MIT
+The MIT License (MIT)
