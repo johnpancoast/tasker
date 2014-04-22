@@ -1,6 +1,6 @@
 {
     "name": "shideon/tasker",
-    "description": "A simple task scheduler",
+    "description": "A simple job scheduler",
     "require": {
         "php": ">=5.4.0",
         "symfony/config": "dev-master",
