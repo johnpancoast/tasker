@@ -56,7 +56,8 @@ Each job may contain the following values:
 * **time** (required) - The time the job should run. Any legal cron expression is accepted.
 * *Either...*
   * **command** - A command to execute on the sysetm. There is also the special keyword `$console` which translates to the same console that the tasker command was executed from. So the following string `$console my:command --my-option` would be translated to `/path/to/tasker/bin/console my:command --my-option`. *The console in the lib is only aware of the 2 internal lib commands. For more on customizing this, see Symfony's docs for the [console component](http://symfony.com/doc/current/components/console/introduction.html).*
-  * **class** - A class to run. The class must implement the `Shideon\Tasker\TaskInterface` interface. If the lib isn't aware of your class' namespace you can use the `file` config value to specify the file that the class resides in. The file will be `require`d before the class is called on.
+  * **class** - A class to run. The class must implement the `Shideon\Tasker\TaskInterface` interface. If the lib isn't aware of your class' namespace you can use the `file` config value below.
+  * **file** - Used to specify the file that the above `class` resides in. The file will be `require`d before the class is called on.
   
 Logging
 -------
@@ -70,7 +71,7 @@ Extending
 ---------
 The commands `TaskerCommand` (shideon:tasker) and `RunTaskCommand` (shideon:tasker:run_task) are easily extensible. The most common reason to do this will be to instantiate monolog using custom functionality (which can be done by extending the command and defining your own `buildLogger()` method).
 
-If doing this, remember that `bin/console` will not be aware of your new commands. You will probably want to create a new console that loads your commands then have your system's scheduler call on that instead of the default console. For more on this, see Symfony's docs for the [console compoenent](http://symfony.com/doc/current/components/console/introduction.html).
+If doing this, remember that `bin/console` will not be aware of your new commands. You will probably want to create a new console that loads your commands then have your system's scheduler call on that instead of the default console. For more on this, see Symfony's docs for the [console component](http://symfony.com/doc/current/components/console/introduction.html).
 
 LICENSE
 -------
