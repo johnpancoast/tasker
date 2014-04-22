@@ -57,7 +57,7 @@ Each job may contain the following values:
 * *Either...*
   * **command** - A command to execute on the sysetm. There is also the special keyword `$console` which translates to the same console that the tasker command was executed from. So the following string `$console my:command --my-option` would be translated to `/path/to/tasker/bin/console my:command --my-option`. *The console in the lib is only aware of the 2 internal lib commands. For more on customizing this, see Symfony's docs for the [console component](http://symfony.com/doc/current/components/console/introduction.html).*
   * **class** - A class to run. The class must implement the `Shideon\Tasker\TaskInterface` interface. If the lib isn't aware of your class' namespace you can use the `file` config value below.
-  * **file** - Used to specify the file that the above `class` resides in. The file will be `require`d before the class is called on.
+* **file** - Used to specify the file that the above `class` resides in. The file will be `require`d before the class is called on.
   
 Logging
 -------
