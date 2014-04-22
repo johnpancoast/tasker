@@ -24,7 +24,7 @@ The bundle should be installed using [composer](https://getcomposer.org).
 
 Usage
 -----
-Tasker is simple. Create a cron job (or equivalent) that runs the tasker command every minute. The command requires 2 options. `config_file` which is a path to your file that contains the jobs to run and `log_file` which is where notices get sent to.
+Tasker is simple. Create a cron job (or equivalent) that runs the tasker command every minute. The command requires 2 options. `--config_file` which is a path to your file that contains the jobs to run and `--log_file` which is where notices get sent to.
 
 **Config file - /path/to/config.yml**
 
@@ -36,7 +36,7 @@ tasker:
          command: "sleep 10"
        - name: "My every other minute job"
          time: "*/2 * * * *"
-         class: My\Fkn\Class
+         class: "My\Fkn\Class"
 ```
 
 **Crontab**
@@ -68,6 +68,10 @@ There is currently no way to define different or additional handlers for the log
 
 Extending
 ---------
-The commands `TaskerCommand` (shideon:tasker) and `RunTaskCommand` (shideon:tasker:run_task) are easily extensible. The most common reason to do this will be to instantiate monolog using custom functionality (which can be done by extending the command and defining your own `buildLogger()` method.)
+The commands `TaskerCommand` (shideon:tasker) and `RunTaskCommand` (shideon:tasker:run_task) are easily extensible. The most common reason to do this will be to instantiate monolog using custom functionality (which can be done by extending the command and defining your own `buildLogger()` method).
 
 If doing this, remember that `bin/console` will not be aware of your new commands. You will probably want to create a new console that loads your commands then have your system's scheduler call on that instead of the default console. For more on this, see Symfony's docs for the [console compoenent](http://symfony.com/doc/current/components/console/introduction.html).
+
+LICENSE
+-------
+The MIT License (MIT)
