@@ -3,10 +3,10 @@
     "description": "A simple job scheduler",
     "require": {
         "php": ">=5.4.0",
-        "symfony/config": "dev-master",
-        "symfony/console": "dev-master",
-        "symfony/yaml": "dev-master",
-        "psr/log": "dev-master",
+        "symfony/config": "~2.6",
+        "symfony/console": "~2.6",
+        "symfony/yaml": "~2.6",
+        "psr/log": "~1.0",
         "mtdowling/cron-expression": "~1.0.3",
         "monolog/monolog": "~1.8.0"
     },
