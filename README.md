@@ -1,6 +1,8 @@
 Tasker
 ======
 
+**This was built *years* ago, but never saw the light of day. I'd likely change it up before using it myself so you should probably avoid it =P.**
+
 Tasker is a simple PHP job scheduler that allows you to specify when your application's jobs should run by using a familiar cron syntax. The benefit is that your app's jobs and the times they run are managed inside your application instead of them living in a crontab (or equivalent) which lies outside of your application.
 
 [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/shideon/tasker/badges/quality-score.png?s=f942227138603af672f261effb82842ae00d1d2a)](https://scrutinizer-ci.com/g/shideon/tasker/)
